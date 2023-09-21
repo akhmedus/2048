@@ -12,48 +12,87 @@ public class TileManager : MonoBehaviour
     public CellManager cell;
     [HideInInspector]
     public int numeric;
+    [HideInInspector]
+    public bool locked;
 
     Image bg;
     TextMeshProUGUI text;
 
     void Awake()
     {
-        bg=GetComponent<Image>();
-        text=GetComponentInChildren<TextMeshProUGUI>();
+        bg = GetComponent<Image>();
+        text = GetComponentInChildren<TextMeshProUGUI>();
     }
 
     public void SetDesign(TileDesign tileDesign, int value)
     {
-        design=tileDesign;
-        numeric=value;
+        design = tileDesign;
+        numeric = value;
 
-        bg.color=design.bgColor;
-        text.color=design.txtColor;
-        text.text=numeric.ToString();
+        bg.color = design.bgColor;
+        text.color = design.txtColor;
+        text.text = numeric.ToString();
     }
 
     public void SpawnTile(CellManager cellManager)
     {
-        if(cell!=null)
+        if (cell != null)
         {
-            cell.tile=null;
-        }
-
-        cell=cellManager;
-        cell.tile=this;
-
-        transform.position=cell.transform.position;
-    }
-
-    public void Moving(CellManager cellManager)
-    {
-        if (cell != null) {
             cell.tile = null;
         }
 
         cell = cellManager;
         cell.tile = this;
 
-        transform.position=cell.transform.position;
+        transform.position = cellManager.transform.position;
+    }
+
+    public void Moving(CellManager cellManager)
+    {
+        if (cell != null)
+        {
+            cell.tile = null;
+        }
+
+        cell = cellManager;
+        cell.tile = this;
+
+        StartCoroutine(MoveAnimation(cellManager.transform.position, false));
+    }
+
+    public void TileMerge(CellManager cellManager)
+    {
+        if (cell != null)
+        {
+            cell.tile = null;
+        }
+
+        cell = null;
+        cellManager.tile.locked = true;
+
+        StartCoroutine(MoveAnimation(cellManager.transform.position, true));
+
+    }
+
+    IEnumerator MoveAnimation(Vector3 vector, bool merging)
+    {
+        float timePassed = 0;
+        float timeLenght = .1f;
+
+        var startPos = transform.position;
+
+        while (timePassed < timeLenght)
+        {
+            transform.position = Vector3.Lerp(startPos, vector, timePassed / timeLenght);
+            timePassed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = vector;
+
+        if (merging)
+        {
+            Destroy(gameObject);
+        }
     }
 }

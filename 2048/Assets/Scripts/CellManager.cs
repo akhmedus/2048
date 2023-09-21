@@ -11,11 +11,11 @@ public class CellManager : MonoBehaviour
 
     public bool IsEmpty()
     {
-        return tile==null;
+        return tile == null;
     }
 
     public bool IsNotEmpty()
     {
-        return tile!=null;
+        return tile != null;
     }
 }

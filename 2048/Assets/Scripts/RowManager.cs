@@ -9,6 +9,6 @@ public class RowManager : MonoBehaviour
 
     void Awake()
     {
-        cells=GetComponentsInChildren<CellManager>();
+        cells = GetComponentsInChildren<CellManager>();
     }
 }

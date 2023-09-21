@@ -19,13 +19,13 @@ public class GridManager : MonoBehaviour
     }
     public int GridWidth()
     {
-        return GridSize()/GridHeight();
+        return GridSize() / GridHeight();
     }
 
     void Awake()
     {
-        rows=GetComponentsInChildren<RowManager>();
-        cells=GetComponentsInChildren<CellManager>();
+        rows = GetComponentsInChildren<RowManager>();
+        cells = GetComponentsInChildren<CellManager>();
     }
 
     void Start()
@@ -34,7 +34,7 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < rows[y].cells.Length; x++)
             {
-                rows[y].cells[x].position=new Vector2Int(x,y);
+                rows[y].cells[x].position = new Vector2Int(x, y);
             }
         }
     }
@@ -46,38 +46,41 @@ public class GridManager : MonoBehaviour
 
     public CellManager GetCell(int x, int y)
     {
-        if (x >= 0 && x < GridWidth() && y >= 0 && y < GridHeight()) {
+        if (x >= 0 && x < GridWidth() && y >= 0 && y < GridHeight())
+        {
             return rows[y].cells[x];
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
 
     public CellManager GetNeighborCell(CellManager cellManager, Vector2Int vector)
     {
-        var cellPos=cellManager.position;
+        var cellPos = cellManager.position;
 
-        cellPos.x+=vector.x;
-        cellPos.y+=vector.y;
-        
+        cellPos.x += vector.x;
+        cellPos.y -= vector.y;
+
         return GetCell(cellPos);
     }
 
     public CellManager GetEmptyCell()
     {
-        int index=Random.Range(0,cells.Length);
-        int startIndex=index;
+        int index = Random.Range(0, cells.Length);
+        int startIndex = index;
 
         while (cells[index].IsNotEmpty())
         {
             index++;
 
-            if(index>=cells.Length)
+            if (index >= cells.Length)
             {
-                index=0;
+                index = 0;
             }
 
-            if(index==startIndex)
+            if (index == startIndex)
             {
                 return null;
             }
