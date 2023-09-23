@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
+    public GameManager gameManager;
     public TileManager prefab;
     GridManager grid;
     List<TileManager> tiles;
@@ -16,18 +17,12 @@ public class BoardManager : MonoBehaviour
         tiles = new List<TileManager>(16);
     }
 
-    void CreateTile()
+    public void CreateTile()
     {
         var tile = Instantiate(prefab, grid.transform);
         tile.SetDesign(designs[0], 2);
         tile.SpawnTile(grid.GetEmptyCell());
         tiles.Add(tile);
-    }
-
-    void Start()
-    {
-        CreateTile();
-        CreateTile();
     }
 
     void Update()
@@ -122,6 +117,11 @@ public class BoardManager : MonoBehaviour
         {
             CreateTile();
         }
+
+        if (CheckedBoard())
+        {
+            gameManager.GameOver();
+        }
     }
 
     bool TilesJoining(TileManager tileManager1, TileManager tileManager2)
@@ -136,6 +136,8 @@ public class BoardManager : MonoBehaviour
         int tileIndex = Mathf.Clamp(GetTileIndex(tileManager2.design) + 1, 0, designs.Length - 1);
         int numeric = tileManager2.numeric * 2;
         tileManager2.SetDesign(designs[tileIndex], numeric);
+
+        gameManager.GetPoints(numeric);
     }
 
     int GetTileIndex(TileDesign design)
@@ -148,5 +150,57 @@ public class BoardManager : MonoBehaviour
             }
         }
         return -1;
+    }
+
+    public void DestroyTile()
+    {
+        foreach (var item in grid.cells)
+        {
+            item.tile = null;
+        }
+        foreach (var item in tiles)
+        {
+            Destroy(item.gameObject);
+        }
+
+        tiles.Clear();
+    }
+
+    bool CheckedBoard()
+    {
+        if (tiles.Count != grid.GridSize())
+        {
+            return false;
+        }
+
+        foreach (var item in tiles)
+        {
+            var up = grid.GetNeighborCell(item.cell, Vector2Int.up);
+            var down = grid.GetNeighborCell(item.cell, Vector2Int.down);
+            var left = grid.GetNeighborCell(item.cell, Vector2Int.left);
+            var right = grid.GetNeighborCell(item.cell, Vector2Int.right);
+
+            if (up != null && TilesJoining(item, up.tile))
+            {
+                return false;
+            }
+
+            if (down != null && TilesJoining(item, down.tile))
+            {
+                return false;
+            }
+
+            if (left != null && TilesJoining(item, left.tile))
+            {
+                return false;
+            }
+
+            if (right != null && TilesJoining(item, right.tile))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
